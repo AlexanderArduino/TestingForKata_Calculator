@@ -49,7 +49,7 @@ public class Main {
             try {
                 op2 = Integer.parseInt(operandyString[1]);
             } catch (Exception e) {
-                System.out.println("Не второе первое число");
+                System.out.println("ОШИБКА!!! Не введено второе число");
             }
             if (checkDiapazone(op1) & checkDiapazone(op2)) {
                 tmpResult = goMath(op1, op2, znak);
@@ -178,7 +178,7 @@ public class Main {
     }
 
     /**
-     * Проверка строки на наличие ТОЛЬКО символо от 0 до 9 (арабские числа)
+     * Проверка строки на наличие ТОЛЬКО символ от 0 до 9 (арабские числа)
      *
      * @param s - входящая строка
      * @return - true: если ТОЛЬКО символы от 0 до 9, false - если есть хотя бы один любой другой символ
