@@ -1,47 +1,31 @@
 import java.io.IOException;
-import java.math.MathContext;
-
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException, NumberFormatException {
+        String str;
+        Scanner sc = new Scanner(System.in);
 
-//        boolean manual = true;
-//
-//        if(manual){
-//
-//        }
-//int a = 5;
-//int b = 3;
-//int c = a / b;
-//        System.out.println(c);
-
-//        String str = "XI+V";
-//        String str = "X+5";
-        String str = "I+X";
-//        String str = "19+5";
-//        String str = " 6 * 8 ";
-//        String str = " * 8";
-//        String str = "3,1+3,2";
-//        String str = "123.4+123.5";
-
-//
-//        double d = Double.parseDouble("123.5");
-//        System.out.println(d);
-//        int i = Integer.parseInt("123.5");
-//        System.out.println(i);
-
-        System.out.println("Результат: " + calc(str));
+        while(true){
+            if(sc.hasNext()){
+                str = sc.nextLine();
+                System.out.println("Результат: " + calc(str));
+            }
+        }
     }
 
 
     public static String calc(String input) throws IOException, NumberFormatException {
-        String znak = null;
-        String[] operandyString = new String[0];
-        int tmpResult;
-        String result = new String();
+        String znak = null;     // Переменная для хранения знака операции;
+        String[] operandyString = new String[0]; // Массив для хранения операндов после их разделения
+        int tmpResult; // Временное хранение результата операции для последующего перевода с арабских в римские
+        String result = new String(); // Переменная для итогового результата вычислений калькулятора
+
         System.out.println("Введенное значение: " + input);
 
-        input = input.toUpperCase();
+        input = input.toUpperCase(); // Все к одному регистру
+
+        //Проверка на наличие знаков и разделение на операнды
         if (proverkaNaNalichieZnakov(input)) {
             znak = kakoiZnak(input);
 //            System.out.println("ZNAK: " + znak);
@@ -51,8 +35,11 @@ public class Main {
             System.out.println("Оператор 2: " + operandyString[1]);
         }
 
+        // Проверка на использование одинаковых систем счисления для обоих операндов
         int system = kakayaSistema(operandyString[0], operandyString[1]);
         int op1 = 0, op2 = 0;
+
+        // Обработка арабской системы счисления
         if (system == 0) {
             try {
                 op1 = Integer.parseInt(operandyString[0]);
@@ -70,6 +57,7 @@ public class Main {
                 System.out.println("Результат операции " + znak + " :" + tmpResult);
             }
 
+            // Обработка рисмкой системы счисления
         } else if (system == 1) {
             op1 = convertRomanToArabian(operandyString[0]);
             op2 = convertRomanToArabian(operandyString[1]);
@@ -139,7 +127,7 @@ public class Main {
 
     /**
      * Используется для вычисления какой конкретно знак используется в строке
-     * На вход получает строку. Поочередно сравнивает каждый символ строки с знаками "+", "-", "*", "/";
+     * На вход получает строку. Поочередно сравнивает каждый символ строки со знаками "+", "-", "*", "/";
      *
      * @param s - выражение в виде строки
      * @return - строку и символом оператора
@@ -201,8 +189,7 @@ public class Main {
         array = s.toCharArray();
 
         for (int i = 0; i < s.length(); i++) {
-            if (array[i] == '0' || array[i] == '1' || array[i] == '2' || array[i] == '3' || array[i] == '4' ||
-                    array[i] == '5' || array[i] == '6' || array[i] == '7' || array[i] == '8' || array[i] == '9') {
+            if (array[i] == '0' || array[i] == '1' || array[i] == '2' || array[i] == '3' || array[i] == '4' || array[i] == '5' || array[i] == '6' || array[i] == '7' || array[i] == '8' || array[i] == '9') {
                 count++;
             }
         }
@@ -216,16 +203,15 @@ public class Main {
     /**
      * Проверка строки на наличие ТОЛЬКО символов I, V, X, L, C, D, M (Римские числа).
      *
-     * @param s - входящая строка
-     * @return - true: если ТОЛЬКО символы I, V, X, L, C, D, M    false - если есть хотя бы один любой другой символ
+     * @param s - входящая строка.
+     * @return - true: если ТОЛЬКО символы I, V, X, L, C, D, M    false - если есть хотя бы один любой другой символ.
      */
     private static boolean isRoman(String s) {
         int count = 0;
         char[] array = s.toCharArray();
 
         for (int i = 0; i < s.length(); i++) {
-            if (array[i] == 'I' || array[i] == 'V' || array[i] == 'X' || array[i] == 'L' || array[i] == 'C' ||
-                    array[i] == 'D' || array[i] == 'M') {
+            if (array[i] == 'I' || array[i] == 'V' || array[i] == 'X' || array[i] == 'L' || array[i] == 'C' || array[i] == 'D' || array[i] == 'M') {
                 count++;
             }
         }
@@ -237,11 +223,11 @@ public class Main {
     }
 
     /**
-     * На вход подается два числа
+     * Определяет какая система счисления у чисел на входе. На вход подается два числа.
      *
-     * @param s1 - число 1
-     * @param s2 - число 2
-     * @return - число. Если 0 - оба числа арабские, 1 - оба числа римские
+     * @param s1 - число 1.
+     * @param s2 - число 2.
+     * @return - 0 - оба числа арабские, 1 - оба числа римские.
      * @throws IOException - исключение выбрасывается, если числа разных систем.
      */
     static int kakayaSistema(String s1, String s2) throws IOException {
@@ -327,13 +313,24 @@ public class Main {
         return total;
     }
 
+    /**
+     * Проверка диапазона (1-10) введенного числа.
+     * @param op - введенное число
+     * @return - true - если число в диапазоне, false - если число вне диапазона
+     */
     static boolean checkDiapazone(int op) {
         if ((op > 0 & op <= 10)) {
             return true;
-        } else
-            throw new NumberFormatException("Введенные числа не соответствуют диапазону от 1 до 10 включительно");
+        } else throw new NumberFormatException("Введенные числа не соответствуют диапазону от 1 до 10 включительно");
     }
 
+    /**
+     * Проведение математических операций в зависимости от знака оператора.
+     * @param op1 - число 1
+     * @param op2 - число 2
+     * @param znak - знак оператора
+     * @return - результат в формате int.
+     */
     static int goMath(int op1, int op2, String znak) {
         int result = 0;
         switch (znak) {
@@ -354,6 +351,11 @@ public class Main {
         return result;
     }
 
+    /**
+     * Перевод числа из арабской в римскую систему счисления
+     * @param num - число
+     * @return - римская запись арабского числа
+     */
     static String convertArabianToRoman(int num) {
         StringBuilder sb = new StringBuilder();
         int count, temp;
