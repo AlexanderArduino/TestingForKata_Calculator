@@ -1,25 +1,94 @@
 import java.io.IOException;
+import java.math.MathContext;
+
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        //        String str = " X I + I X ";
-//        String str = " ";
-        String str = "12 3 -X I";
-//        String str = "123/123*125+5";
-//        String str = "123/ii+ xI";
-        String znak = null;
-        String[] operandy = new String[0];
+    public static void main(String[] args) throws IOException, NumberFormatException {
 
-        System.out.println("Введенное значение" + str);
-        if (proverkaNaNalichieZnakov(str)) {
-            znak = kakoiZnak(str);
-            operandy = razdelenieNaOperandy(str);
-            for (String s : operandy) {
-                trimAllSpaces(s);
-                System.out.println(s);
+//        boolean manual = true;
+//
+//        if(manual){
+//
+//        }
+//int a = 5;
+//int b = 3;
+//int c = a / b;
+//        System.out.println(c);
+
+//        String str = "XI+V";
+//        String str = "X+5";
+        String str = "I+X";
+//        String str = "19+5";
+//        String str = " 6 * 8 ";
+//        String str = " * 8";
+//        String str = "3,1+3,2";
+//        String str = "123.4+123.5";
+
+//
+//        double d = Double.parseDouble("123.5");
+//        System.out.println(d);
+//        int i = Integer.parseInt("123.5");
+//        System.out.println(i);
+
+        System.out.println("Результат: " + calc(str));
+    }
+
+
+    public static String calc(String input) throws IOException, NumberFormatException {
+        String znak = null;
+        String[] operandyString = new String[0];
+        int tmpResult;
+        String result = new String();
+        System.out.println("Введенное значение: " + input);
+
+        input = input.toUpperCase();
+        if (proverkaNaNalichieZnakov(input)) {
+            znak = kakoiZnak(input);
+//            System.out.println("ZNAK: " + znak);
+            operandyString = razdelenieNaOperandy(input);
+
+            System.out.println("Оператор 1: " + operandyString[0]);
+            System.out.println("Оператор 2: " + operandyString[1]);
+        }
+
+        int system = kakayaSistema(operandyString[0], operandyString[1]);
+        int op1 = 0, op2 = 0;
+        if (system == 0) {
+            try {
+                op1 = Integer.parseInt(operandyString[0]);
+            } catch (NumberFormatException e) {
+                System.out.println("ОШИБКА!!! Не введено первое число");
+            }
+            try {
+                op2 = Integer.parseInt(operandyString[1]);
+            } catch (Exception e) {
+                System.out.println("Не второе первое число");
+            }
+            if (checkDiapazone(op1) & checkDiapazone(op2)) {
+                tmpResult = goMath(op1, op2, znak);
+                result = Integer.toString(tmpResult);
+                System.out.println("Результат операции " + znak + " :" + tmpResult);
+            }
+
+        } else if (system == 1) {
+            op1 = convertRomanToArabian(operandyString[0]);
+            op2 = convertRomanToArabian(operandyString[1]);
+            if (checkDiapazone(op1) & checkDiapazone(op2)) {
+                tmpResult = goMath(op1, op2, znak);
+                result = Integer.toString(tmpResult);
+                System.out.println("Результат операции " + znak + " :" + tmpResult);
+            } else
+                throw new NumberFormatException("Введенные числа не соответствуют диапазону от 1 до 10 включительно");
+            tmpResult = goMath(op1, op2, znak);
+            if (tmpResult < 0) {
+                throw new IOException("Результат операции - отрицательное число. Такого нет в римской системе");
+            } else {
+                result = convertArabianToRoman(tmpResult);
             }
         }
+        return result;
     }
+
 
     /**
      * Проверяется наличие операторов сложения, вычитания, деления, умножения.
@@ -38,6 +107,11 @@ public class Main {
                 if (c == '+' || c == '-' || c == '*' || c == '/') {
                     count += 1;
                 }
+            }
+        }
+        for (char c : chars) {
+            if (c == '.' || c == ',') {
+                throw new IOException("Зафиксирован возможный ввод дробного числа (наличие точки или запятой)");
             }
         }
         if (count == 0) {
@@ -87,8 +161,8 @@ public class Main {
                 case '/':
                     znak = "/";
                     break;
-                default:
-                    znak = null;
+//                default:
+//                    znak = null;
             }
         }
         return znak;
@@ -121,7 +195,7 @@ public class Main {
      * @param s - входящая строка
      * @return - true: если ТОЛЬКО символы от 0 до 9, false - если есть хотя бы один любой другой символ
      */
-    static boolean isArabian(String s) {
+    private static boolean isArabian(String s) {
         int count = 0;
         char[] array = new char[0];
         array = s.toCharArray();
@@ -140,12 +214,12 @@ public class Main {
     }
 
     /**
-     * Проверка строки на наличие ТОЛЬКО символов I, V, X, L, C, D, M (Римские числа)
+     * Проверка строки на наличие ТОЛЬКО символов I, V, X, L, C, D, M (Римские числа).
      *
      * @param s - входящая строка
      * @return - true: если ТОЛЬКО символы I, V, X, L, C, D, M    false - если есть хотя бы один любой другой символ
      */
-    static boolean isRoman(String s) {
+    private static boolean isRoman(String s) {
         int count = 0;
         char[] array = s.toCharArray();
 
@@ -164,22 +238,24 @@ public class Main {
 
     /**
      * На вход подается два числа
+     *
      * @param s1 - число 1
      * @param s2 - число 2
      * @return - число. Если 0 - оба числа арабские, 1 - оба числа римские
      * @throws IOException - исключение выбрасывается, если числа разных систем.
      */
-    static int kakayaSistema(String s1, String s2) throws IOException{
+    static int kakayaSistema(String s1, String s2) throws IOException {
         int result;
-        if(isArabian(s1) && isArabian(s2)){
+        if (isArabian(s1) && isArabian(s2)) {
             result = 0;
-        } else if(isRoman(s1) && isRoman(s2)){
+        } else if (isRoman(s1) && isRoman(s2)) {
             result = 1;
         } else {
             throw new IOException("Вы используете различные системы исчисления");
         }
         return result;
     }
+
     /**
      * Конвертирует число из римского написания в эквивалентное арабское число для удобства проведения вычислений
      *
@@ -190,7 +266,6 @@ public class Main {
         char previos = '0';
         int total = 0;
         char[] array = s.toCharArray();
-        System.out.println(array);
 
         for (int i = array.length - 1; i >= 0; i--) {
             if (array[i] == 'I') {
@@ -252,4 +327,140 @@ public class Main {
         return total;
     }
 
+    static boolean checkDiapazone(int op) {
+        if ((op > 0 & op <= 10)) {
+            return true;
+        } else
+            throw new NumberFormatException("Введенные числа не соответствуют диапазону от 1 до 10 включительно");
+    }
+
+    static int goMath(int op1, int op2, String znak) {
+        int result = 0;
+        switch (znak) {
+            case "+":
+                result = op1 + op2;
+                break;
+            case "-":
+                result = op1 - op2;
+                break;
+            case "*":
+                result = op1 * op2;
+                break;
+            case "/":
+                result = op1 / op2;
+                break;
+
+        }
+        return result;
+    }
+
+    static String convertArabianToRoman(int num) {
+        StringBuilder sb = new StringBuilder();
+        int count, temp;
+        count = num / 1000;
+        if (count > 0) {
+            for (int i = 1; i <= count; i++) {
+                sb.append("M");
+            }
+        }
+        count = num % 1000 / 100;
+        if (count > 0) {
+            switch (count) {
+                case 1:
+                    sb.append("C");
+                    break;
+                case 2:
+                    sb.append("CC");
+                    break;
+                case 3:
+                    sb.append("CCC");
+                    break;
+                case 4:
+                    sb.append("CD");
+                    break;
+                case 5:
+                    sb.append("D");
+                    break;
+                case 6:
+                    sb.append("DC");
+                    break;
+                case 7:
+                    sb.append("DCC");
+                    break;
+                case 8:
+                    sb.append("DCCC");
+                    break;
+                case 9:
+                    sb.append("CM");
+                    break;
+            }
+        }
+        count = num % 1000 % 100 / 10;
+        if (count > 0) {
+            switch (count) {
+                case 1:
+                    sb.append("X");
+                    break;
+                case 2:
+                    sb.append("XX");
+                    break;
+                case 3:
+                    sb.append("XXX");
+                    break;
+                case 4:
+                    sb.append("XL");
+                    break;
+                case 5:
+                    sb.append("L");
+                    break;
+                case 6:
+                    sb.append("LX");
+                    break;
+                case 7:
+                    sb.append("LXX");
+                    break;
+                case 8:
+                    sb.append("LXXX");
+                    break;
+                case 9:
+                    sb.append("XC");
+                    break;
+            }
+        }
+        count = num % 1000 % 100 % 10 / 1;
+        if (count >= 0) {
+            switch (count) {
+                case 1:
+                    sb.append("I");
+                    break;
+                case 2:
+                    sb.append("II");
+                    break;
+                case 3:
+                    sb.append("III");
+                    break;
+                case 4:
+                    sb.append("IV");
+                    break;
+                case 5:
+                    sb.append("V");
+                    break;
+                case 6:
+                    sb.append("VI");
+                    break;
+                case 7:
+                    sb.append("VII");
+                    break;
+                case 8:
+                    sb.append("VIII");
+                    break;
+                case 9:
+                    sb.append("IX");
+                    break;
+                case 0:
+                    sb.append("");
+            }
+        }
+        return sb.toString();
+    }
 }
