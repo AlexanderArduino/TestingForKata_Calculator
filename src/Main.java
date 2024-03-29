@@ -9,7 +9,7 @@ public class Main {
         while(true){
             if(sc.hasNext()){
                 str = sc.nextLine();
-                System.out.println("Результат: " + calc(str));
+                System.out.println("Результат:  " + calc(str));
             }
         }
     }
