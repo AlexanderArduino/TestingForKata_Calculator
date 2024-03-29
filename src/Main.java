@@ -167,7 +167,7 @@ public class Main {
      * @param s1 - число 1
      * @param s2 - число 2
      * @return - число. Если 0 - оба числа арабские, 1 - оба числа римские
-     * @throws IOException - исключение выбрасывается, если числа разных систем
+     * @throws IOException - исключение выбрасывается, если числа разных систем.
      */
     static int kakayaSistema(String s1, String s2) throws IOException{
         int result;
